@@ -11,8 +11,4 @@ db = SQLAlchemy()
 db.init_app(app)
 
 
-import views
-
-
-if __name__ == '__main__':
-    app.run()
+from progress_report import views

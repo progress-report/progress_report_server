@@ -1,4 +1,4 @@
-from app import app
+from progress_report import app
 from flask import jsonify, url_for
 
 STATES = ['Ohio', 'Michigan', 'Wisconsin']
