@@ -1,7 +1,8 @@
 from progress_report import app
-from flask import jsonify, url_for
+from progress_report.state_voter_data import StateVoterData
+from flask import jsonify, url_for, abort
 
-STATES = ['Ohio', 'Michigan', 'Wisconsin']
+STATES = ['ohio']
 
 
 @app.route('/api')
@@ -19,7 +20,10 @@ def states():
     response = {
         'back' : url_for('index'),
         'version' : 'v0.0',
-        'states' : {state: url_for('show_state', state=state.lower()) for state in STATES},
+        'states' : {
+            state: url_for('show_state', state=state.lower())
+            for state in STATES
+        },
         'data_source' : {
             'name' : 'Harvard Dataverse',
             'url' : '#'
@@ -30,12 +34,40 @@ def states():
 
 @app.route('/api/states/<state>')
 def show_state(state):
+    state = _find_state(state)
+
     response = {
+        **state.serialize(),
         'back' : url_for('states'),
         'version' : 'v0.0',
-        'name' : state.title(),
     }
-    return jsonify(response)
+    return jsonify(state.serialize())
+
+
+def _is_valid_state(state):
+    return state.lower() in STATES
+
+def _find_state(state):
+    if not _is_valid_state(state): abort(404)
+    data = [
+        (1, 75, 25, 100),
+        (2, 60, 40, 100),
+        (3, 43, 57, 100),
+        (4, 48, 52, 100),
+        (5, 49, 51, 100),
+    ]
+    return StateVoterData(
+        state,
+        data=data
+    )
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return jsonify(error=404, text=str(e)), 404
+
+
+
 
 
 #
