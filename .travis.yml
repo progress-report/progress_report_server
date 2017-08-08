@@ -1,4 +1,13 @@
 language: python
 python:
-  - "3.6"
-script: "python3 -m pytest"
+  - '3.6'
+
+script: bin/test
+
+# Until we have database migrations, we're using sqlite for tests.
+# Keeping the database in-memory makes writing the tests easier.
+#
+# services:
+#   - postgresql
+# before_script:
+#   - psql -c 'CREATE DATABASE progress_report_test;' -U postgres

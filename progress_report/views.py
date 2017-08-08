@@ -45,7 +45,7 @@ def states():
 def show_ohio():
     ohio_data = StateVoterData(
         'Ohio',
-        data=db.select_ohio_district_voting_data(),
+        data=db.get_ohio_district_voting_data(),
     )
 
     response = {
