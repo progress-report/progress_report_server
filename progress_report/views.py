@@ -1,71 +1,75 @@
 from progress_report import app
 from progress_report.state_voter_data import StateVoterData
+from progress_report.datastore import Datastore
+
 from flask import jsonify, url_for, abort
 
-STATES = ['ohio']
+db = Datastore(app)
 
 
-@app.route('/api')
+@app.route('/api/')
 def index():
     response = {
         'version' : 'v0.0',
         'greeting' : 'Welcome to the Scorecard API!',
-        'states' : url_for('states'),
+        'links' : {
+            'self' : url_for('index', _external=True),
+            'states' : url_for('states', _external=True),
+        },
     }
     return jsonify(response)
 
 
-@app.route('/api/states')
+@app.route('/api/states/')
 def states():
     response = {
-        'back' : url_for('index'),
         'version' : 'v0.0',
-        'states' : {
-            state: url_for('show_state', state=state.lower())
-            for state in STATES
+        'meta' : {
+            'data_source' : {
+                'name' : 'Harvard Dataverse',
+                'url' : '#',
+            },
         },
-        'data_source' : {
-            'name' : 'Harvard Dataverse',
-            'url' : '#'
-        },
+        'links' : {
+            'self' : url_for('states', _external=True),
+            'back' : url_for('index', _external=True),
+            'states' : {
+                'Ohio': url_for('show_ohio', _external=True),
+            },
+        }
     }
     return jsonify(response)
 
 
-@app.route('/api/states/<state>')
-def show_state(state):
-    state = _find_state(state)
-
-    response = {
-        **state.serialize(),
-        'back' : url_for('states'),
-        'version' : 'v0.0',
-    }
-    return jsonify(state.serialize())
-
-
-def _is_valid_state(state):
-    return state.lower() in STATES
-
-def _find_state(state):
-    if not _is_valid_state(state): abort(404)
-    data = [
-        (1, 75, 25, 100),
-        (2, 60, 40, 100),
-        (3, 43, 57, 100),
-        (4, 48, 52, 100),
-        (5, 49, 51, 100),
-    ]
-    return StateVoterData(
-        state,
-        data=data
+@app.route('/api/states/ohio')
+def show_ohio():
+    ohio_data = StateVoterData(
+        'Ohio',
+        data=db.select_ohio_district_voting_data(),
     )
 
+    response = {
+        'data' : ohio_data.serialize(),
+        'links' : {
+            'self' : url_for('show_ohio', _external=True),
+            'back' : url_for('states', _external=True),
+        },
+        'version' : 'v0.0',
+    }
+    return jsonify(response)
+
+
+#
+# Error Handling
+#
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return jsonify(error=404, text=str(e)), 404
+    return jsonify(error=404, message=str(e)), 404
 
+@app.errorhandler(500)
+def page_not_found(e):
+    return jsonify(error=500, message=str(e)), 500
 
 
 
