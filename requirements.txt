@@ -4,7 +4,6 @@ gunicorn==19.7.1
 itsdangerous==0.24
 Jinja2==2.9.6
 MarkupSafe==1.0
--e git+git@github.com:progress-report/progress_report_server.git@955f04b2ac402b77f00ce636d33891244f2d20d2#egg=progress_report
 psycopg2==2.7.3
 py==1.4.34
 pytest==3.2.0
