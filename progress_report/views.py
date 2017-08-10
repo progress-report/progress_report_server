@@ -1,41 +1,77 @@
-from app import app
-from flask import jsonify, url_for
+from progress_report import app
+from progress_report.state_voter_data import StateVoterData
+from progress_report.datastore import Datastore
 
-STATES = ['Ohio', 'Michigan', 'Wisconsin']
+from flask import jsonify, url_for, abort
+
+db = Datastore(app)
 
 
-@app.route('/api')
+@app.route('/api/')
 def index():
     response = {
         'version' : 'v0.0',
         'greeting' : 'Welcome to the Scorecard API!',
-        'states' : url_for('states'),
-    }
-    return jsonify(response)
-
-
-@app.route('/api/states')
-def states():
-    response = {
-        'back' : url_for('index'),
-        'version' : 'v0.0',
-        'states' : {state: url_for('show_state', state=state.lower()) for state in STATES},
-        'data_source' : {
-            'name' : 'Harvard Dataverse',
-            'url' : '#'
+        'links' : {
+            'self' : url_for('index', _external=True),
+            'states' : url_for('states', _external=True),
         },
     }
     return jsonify(response)
 
 
-@app.route('/api/states/<state>')
-def show_state(state):
+@app.route('/api/states/')
+def states():
     response = {
-        'back' : url_for('states'),
         'version' : 'v0.0',
-        'name' : state.title(),
+        'meta' : {
+            'data_source' : {
+                'name' : 'Harvard Dataverse',
+                'url' : '#',
+            },
+        },
+        'links' : {
+            'self' : url_for('states', _external=True),
+            'back' : url_for('index', _external=True),
+            'states' : {
+                'Ohio': url_for('show_ohio', _external=True),
+            },
+        }
     }
     return jsonify(response)
+
+
+@app.route('/api/states/ohio')
+def show_ohio():
+    ohio_data = StateVoterData(
+        'Ohio',
+        data=db.get_ohio_district_voting_data(),
+    )
+
+    response = {
+        'data' : ohio_data.serialize(),
+        'links' : {
+            'self' : url_for('show_ohio', _external=True),
+            'back' : url_for('states', _external=True),
+        },
+        'version' : 'v0.0',
+    }
+    return jsonify(response)
+
+
+#
+# Error Handling
+#
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return jsonify(error=404, message=str(e)), 404
+
+@app.errorhandler(500)
+def page_not_found(e):
+    return jsonify(error=500, message=str(e)), 500
+
+
 
 
 #

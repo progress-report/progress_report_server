@@ -2,15 +2,14 @@ import os
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 class Config(object):
-    FLASK_APP = 'app.py'
     DEBUG = False
     TESTING = False
-    SECRET_KEY = 'not-very-secret'
+    SECRET_KEY = os.environ.get('SECRET_KEY')
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 class ProductionConfig(Config):
-    DEBUG = False
+    pass
 
 class StagingConfig(Config):
     DEVELOPMENT = True
@@ -19,8 +18,11 @@ class StagingConfig(Config):
 class DevelopmentConfig(Config):
     DEVELOPMENT = True
     DEBUG = True
-    # fallback to `progress_report`
+
+    # local defaults
+    SECRET_KEY = os.getenv('SECRET_KEY', 'not-very-secret')
     SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL', 'postgresql://localhost/progress_report')
 
 class TestingConfig(Config):
     TESTING = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
