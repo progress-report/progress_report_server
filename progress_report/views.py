@@ -2,7 +2,11 @@ from progress_report import app
 from progress_report.state_voter_data import StateVoterData
 from progress_report.datastore import Datastore
 
-from flask import jsonify, url_for, abort
+from flask import jsonify, url_for
+
+# allow cross-origin requests to all api endpoints
+from flask_cors import CORS
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 db = Datastore(app)
 
@@ -18,6 +22,7 @@ def index():
         },
     }
     return jsonify(response)
+
 
 
 @app.route('/api/states/')
@@ -64,12 +69,12 @@ def show_ohio():
 #
 
 @app.errorhandler(404)
-def page_not_found(e):
-    return jsonify(error=404, message=str(e)), 404
+def page_not_found(ex):
+    return jsonify(error=404, message=str(ex)), 404
 
 @app.errorhandler(500)
-def page_not_found(e):
-    return jsonify(error=500, message=str(e)), 500
+def server_error(ex):
+    return jsonify(error=500, message=str(ex)), 500
 
 
 
