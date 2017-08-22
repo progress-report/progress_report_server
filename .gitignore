@@ -97,3 +97,9 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+# js
+
+node_modules/
+app/public/js/
+app/public/css/
