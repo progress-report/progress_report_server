@@ -37,7 +37,7 @@ class Map {
     queue()
       .defer(d3JSON, '/data/us-congress-113.json')
       .defer(d3JSON, '/data/us.json')
-      .defer(d3JSON, '/data/fips2state.json')
+      .defer(d3JSON, '/data/fips.json')
       .await((error, districts, us, fips) => {
         if(error) throw error;
         data.districts = districts;
