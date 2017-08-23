@@ -1,6 +1,10 @@
 {
   "name": "progress_report",
   "version": "1.0.0",
+  "engines": {
+    "node": "4.4.7",
+    "npm": "5.3.0"
+  },
   "description": "This repository contains the server code for Progress Report. We're using Python 3.6, Flask, and PostgreSQL.",
   "main": "app/src/index.js",
   "directories": {
