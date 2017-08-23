@@ -17,7 +17,7 @@ class App extends React.Component {
         <main>
           <Header />
           <Route exact path="/" component={Homepage} />
-          <Route path="/report" component={Report} />
+          <Route path="/report/:stateName?" component={Report} />
         </main>
       </Router>
     );

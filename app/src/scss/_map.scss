@@ -1,5 +1,5 @@
 #map {
-  width: 75%;
+  width: 66.666%;
   height: 100%;
   max-width: 960px;
   position: relative;
@@ -11,12 +11,18 @@
   }
 
   .state{
-    fill: rgba(#fff,0);
+    fill: rgba(#CDE4E9,0);
     stroke: rgba(#324C59, 0.6);
     cursor: pointer;
+    transition: all .75s ease-in-out;
     &:hover{
       stroke-width: 2px;
       stroke: #4AC3F1;
+    }
+
+    &.inactive{
+      fill: rgba(#CDE4E9, 0.5) !important;
+      stroke: none !important;
     }
   }
 
